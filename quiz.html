@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz App</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: black;
+      color: white;
+    }
+    .container {
+      max-width: 700px;
+      margin: 50px auto;
+      padding: 30px;
+      background: #111;
+      border-radius: 10px;
+    }
+    .login-form, .quiz-section {
+      display: none;
+    }
+    .show { display: block; }
+    h2 { margin-bottom: 20px; }
+
+    input[type="text"], input[type="date"] {
+      padding: 10px;
+      margin-bottom: 20px;
+      width: 100%;
+      border: none;
+      border-radius: 5px;
+    }
+
+    .btn {
+      background: dodgerblue;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .progress-bar {
+      height: 10px;
+      background: #333;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: limegreen;
+      transform-origin: left;
+      transform: scaleX(1);
+    }
+
+    .options {
+      list-style: none;
+      padding: 0;
+    }
+
+    .options li {
+      margin: 10px 0;
+    }
+
+    input[type="radio"] { display: none; }
+
+    .custom-radio {
+      display: inline-block;
+      padding: 10px;
+      border: 2px solid #999;
+      border-radius: 5px;
+      background: #222;
+      color: white;
+      cursor: pointer;
+    }
+
+    input[type="radio"]:checked + .custom-radio {
+      background: limegreen;
+      color: black;
+      border-color: limegreen;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(6px);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: #222;
+      padding: 30px;
+      border-radius: 10px;
+      max-height: 80vh;
+      overflow-y: auto;
+      width: 90%;
+      max-width: 700px;
+    }
+
+    .result-item {
+      padding: 10px;
+      margin-bottom: 15px;
+      border-left: 5px solid;
+    }
+
+    .correct { border-color: limegreen; background: #1b2b1b; }
+    .incorrect { border-color: red; background: #2b1b1b; }
+    .correct-answer { color: red; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Login Form -->
+  <div class="login-form show" id="login-form">
+    <h2>Login to Quiz App</h2>
+    <input type="text" id="username" placeholder="Enter your name" required />
+    <input type="date" id="dob" required />
+    <button class="btn" onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <!-- Quiz Section -->
+  <div class="quiz-section" id="quiz-section">
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <h2 id="question-title"></h2>
+    <ul class="options" id="options-list"></ul>
+    <button class="btn" onclick="submitAnswer()">Submit</button>
+  </div>
+</div>
+
+<!-- Result Modal -->
+<div class="modal" id="result-modal">
+  <div class="modal-content">
+    <h2 id="final-score"></h2>
+    <div id="result-details"></div>
+  </div>
+</div>
+
+<script>
+const questions = [
+  { question: "Capital of France?", options: ["Berlin", "Paris", "Rome", "Madrid"], answer: "Paris" },
+  { question: "5 + 3 =", options: ["7", "8", "9", "6"], answer: "8" },
+  { question: "JS stands for?", options: ["JavaScript", "Java", "JQuery", "JsonScript"], answer: "JavaScript" },
+  { question: "Water chemical formula?", options: ["H2O", "CO2", "NaCl", "O2"], answer: "H2O" },
+  { question: "Fastest land animal?", options: ["Cheetah", "Lion", "Tiger", "Horse"], answer: "Cheetah" },
+  { question: "Sun is a?", options: ["Planet", "Star", "Comet", "Asteroid"], answer: "Star" },
+  { question: "HTML stands for?", options: ["Markup", "Coding", "Scripting", "Hyper Text Markup Language"], answer: "Hyper Text Markup Language" },
+  { question: "Largest ocean?", options: ["Atlantic", "Pacific", "Indian", "Arctic"], answer: "Pacific" },
+  { question: "Human blood color?", options: ["Blue", "Green", "Red", "Yellow"], answer: "Red" },
+  { question: "Smallest prime number?", options: ["1", "2", "3", "5"], answer: "2" },
+  { question: "Earth shape?", options: ["Square", "Oval", "Sphere", "Flat"], answer: "Sphere" },
+  { question: "1 Byte =", options: ["8 bits", "4 bits", "1 bit", "16 bits"], answer: "8 bits" },
+  { question: "Python is a?", options: ["Snake", "Language", "Tool", "IDE"], answer: "Language" },
+  { question: "3 * 3 =", options: ["6", "9", "12", "3"], answer: "9" },
+  { question: "HTML tag for paragraph?", options: ["<p>", "<div>", "<span>", "<text>"], answer: "<p>" },
+];
+
+let current = 0, score = 0, timer;
+let result = [];
+
+function startQuiz() {
+  const name = document.getElementById("username").value;
+  const dob = document.getElementById("dob").value;
+  if (!name || !dob) return alert("Enter name and date of birth!");
+
+  document.getElementById("login-form").classList.remove("show");
+  document.getElementById("quiz-section").classList.add("show");
+  loadQuestion();
+}
+
+function loadQuestion() {
+  clearTimeout(timer);
+  const q = questions[current];
+  document.getElementById("question-title").textContent = `Q${current + 1}. ${q.question}`;
+  document.getElementById("options-list").innerHTML = "";
+
+  q.options.forEach(opt => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <label>
+        <input type="radio" name="option" value="${opt}">
+        <span class="custom-radio">${opt}</span>
+      </label>`;
+    document.getElementById("options-list").appendChild(li);
+  });
+
+  document.getElementById("progress-fill").style.transition = "none";
+  document.getElementById("progress-fill").style.transform = "scaleX(1)";
+  setTimeout(() => {
+    document.getElementById("progress-fill").style.transition = "transform 20s linear";
+    document.getElementById("progress-fill").style.transform = "scaleX(0)";
+  }, 50);
+  timer = setTimeout(() => submitAnswer(), 20000);
+}
+
+function submitAnswer() {
+  clearTimeout(timer);
+  const selected = document.querySelector('input[name="option"]:checked');
+  const userAnswer = selected ? selected.value : null;
+  const correctAnswer = questions[current].answer;
+  const isCorrect = userAnswer === correctAnswer;
+  if (isCorrect) score += 5;
+
+  result.push({
+    question: questions[current].question,
+    userAnswer,
+    correctAnswer,
+    isCorrect
+  });
+
+  current++;
+  if (current < questions.length) {
+    loadQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  document.getElementById("quiz-section").classList.remove("show");
+  const modal = document.getElementById("result-modal");
+  const status = score > 30 ? "✅ Pass" : "❌ Fail";
+  document.getElementById("final-score").innerHTML = `Score: ${score}/75 - <strong>${status}</strong>`;
+
+  document.getElementById("result-details").innerHTML = result.map(r => `
+    <div class="result-item ${r.isCorrect ? "correct" : "incorrect"}">
+      <strong>${r.question}</strong><br>
+      Your Answer: ${r.userAnswer || "<em>Not Answered</em>"}<br>
+      ${!r.isCorrect ? `<span class="correct-answer">Correct Answer: ${r.correctAnswer}</span>` : ""}
+    </div>`).join("");
+
+  modal.style.display = "flex";
+}
+</script>
+
+</body>
+</html>

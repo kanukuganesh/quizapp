@@ -1,0 +1,10 @@
+a=10
+b=20
+c=a+b
+if(c==30){
+    console.log(c)
+}
+else
+{
+    console.log(false)
+}
