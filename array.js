@@ -57,6 +57,27 @@ let ar2=[2]
 // ar.sort()
 // o/p= ["charith","ganesh","sai"]
 
+let num=[1,30,40]
+
+// let num1;
+// num1=num
+// num1 o/p=[1,30,40]
+// num1==num o/p=true // were "num"  are added (or) delete items and  auto matically change in "num1" 
+// let num2=[1,30,40]
+// num2==num o/p=flase becacuse values are same but address are different
+
+let num1=[[1,2,3],[4,5,6],[7,8,9]] //multidimensional array
+// o/p= array(3)Array(3) [ (3) […], (3) […], (3) […] ]
+//0: Array(3) [ 1, 2, 3 ]
+//1: Array(3) [ 4, 5, 6 ]
+//2: Array(3) [ 7, 8, 9 ]
+//length: 3//
+​// according in num is [00,01,02]
+// [1,2,3]
+// num1[0][1] o/p=2
+
+
+
 
 
 
