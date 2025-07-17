@@ -12,8 +12,8 @@ for(let i=0;i<arr.length;i++)
 // 4
 
 arr=[[1,2,3],[4,5,6],[7,8,9]]
- for(row of arr){   // for enter in array in first array and so on 
-    for(col of row){ // in first array in first clomn item and so on
+ for(row of arr){   // for enter in array in first array it complet go to next array and so on 
+    for(col of row){ // in first array in first clomn item  it complet go to next item in colmn and so on
         console.log(col);
     }
  }
