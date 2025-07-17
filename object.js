@@ -15,7 +15,8 @@ ganesh={ name:"Game",age:30,moblie:7780738364}
 // const ganesh={ name:"Game",age:30,moblie:7780738364}
 // constant is using dont change the address of object (when the change the keys)
 
- const student=[ {name:"gana",age:30}, {name:"krishna",age:30}] // one object in creating more object
+const student=[ {name:"gana",age:30}, {name:"krishna",age:30}] // one object in creating more object
+
  // in console o/p=
 // student
 // Array
@@ -38,3 +39,4 @@ ganesh={ name:"Game",age:30,moblie:7780738364}
 // or
 // student[0].age  //  accesing index of key element
 //30
+
