@@ -10,10 +10,10 @@ while(true){
      {
        console.log("try agin");
     }
-  //else if(guess>random){
+   //else if(guess>random){
    // guess=prompt("guess the number is bigger then random")
    //}
-  // else if(guess<random){
-  //  guess=prompt("guess the number is smaller then random")
- // }
+   // else if(guess<random){
+   //  guess=prompt("guess the number is smaller then random")
+   // }
 }
